@@ -1,1 +1,1 @@
-mvn clean install && java -classpath "./target/*;./lib/*;target\classes\*;" com.controller.CrawlInvoker
+java -classpath "./target/*;./lib/*;target\classes\*;" com.controller.CrawlInvoker
