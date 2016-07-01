@@ -52,9 +52,13 @@ public class Crawler implements Runnable{
 			//Searching for a:href in the Document instance
 			Elements links = document.select("a[href]");
 			parseLoop: for(Element link: links) {
-				//Printing the links to the 
 				String obtainedUrl = link.attr("abs:href");
 				if(!this.controller.contains(obtainedUrl)) {
+				//Using the link hence obtained to add to the list of passedURLs
+				//and to the URLs to be parsed by generating further URLs
+				//Reporting the success of parsing to the controller so that
+				//it can pass it to the required repository
+				//and upon successfull passing it will increment the parsed URL count 
 					LOGGER.debug(obtainedUrl);
 					this.controller.addParsedUrl(obtainedUrl);
 					this.controller.addUrlToParse(obtainedUrl);
@@ -62,11 +66,15 @@ public class Crawler implements Runnable{
 					this.controller.incrementIterationCount();
 				}
 				if(!(this.controller.getIterationCount() < Constants.MAX_ITERATION_LIMIT)) {
+					//In case maximum number of possible iterations as defined in Constants.java is
+					//reached, it will cause the program to stop by asking the controller to 
+					//stop all threads and abort execution
 					this.controller.stopCrawlers();
 					break parseLoop;
 				}
 			}
 			if(this.controller.getCyclicBarrier().getNumberWaiting()==1){
+				//Waiting at the barrier
 		        this.controller.getCyclicBarrier().await();
 		        
 		    }
