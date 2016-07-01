@@ -26,4 +26,5 @@ All events related to the Project are being logged in WebCrawler.log
 How to run:
 -----------------------
 Checkout the project and invoke runCrawler.bat
-Give the URL, maximum number of URLs to be written and a file name to which 
+Give the URL, maximum number of URLs to be written and a file name to which the obtained URLs are to be logged
+The output will be saved in the file with a .dat extension
