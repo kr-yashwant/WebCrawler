@@ -25,6 +25,13 @@ All events related to the Project are being logged in WebCrawler.log
 
 How to run:
 -----------------------
-Checkout the project and invoke runCrawler.bat
+For windows:  Checkout the project and invoke runCrawler.bat
+
+For Mac/Linux:  Checkout the project, change read/write access for runCrawler.sh using 
+                chmod 755 runCrawler.sh 
+                and then 
+                bash runCrawler.sh
+
+
 Give the URL, maximum number of URLs to be written and a file name to which the obtained URLs are to be logged
 The output will be saved in the file with a .dat extension
