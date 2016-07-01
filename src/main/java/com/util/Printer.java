@@ -25,19 +25,20 @@ public class Printer {
 	 * @param value
 	 * Writes the value specified only if the value is not empty
 	 */
-	public void write(String value) {
+	public synchronized void write(String value) {
 		if(!"".equalsIgnoreCase(value)) {
-			printWriter.write(value+"\n");
+			printWriter.println(value);
 		}
 	}
 	/**
-	 * 
+	 * Closes the resources being used by the Printer
 	 */
 	public void close() {
+		printWriter.flush();
 		printWriter.close();
 	}
 	/**
-	 * 
+	 * Flushes the PrintWriter Object contents
 	 */
 	public void flush() {
 		printWriter.flush();

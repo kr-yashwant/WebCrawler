@@ -3,6 +3,9 @@ package com.crawler;
 import java.io.IOException;
 import java.util.concurrent.BrokenBarrierException;
 
+import javax.net.ssl.SSLHandshakeException;
+
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,7 +14,15 @@ import org.jsoup.select.Elements;
 import com.controller.CrawlController;
 import com.util.Constants;
 
+/**
+ * @author kryas
+ * declares a single Crawler Thread that will parse the urlPassed to it while 
+ * instantiation and will report the URLs passed to the Controller that it 
+ * answers to
+ *
+ */
 public class Crawler implements Runnable{
+	Logger LOGGER = Logger.getLogger(Crawler.class);
 
 	private String urlPassed;	private CrawlController controller;
 	
@@ -22,10 +33,17 @@ public class Crawler implements Runnable{
 	}
 	
 	/**
-	 * @author kryas
-	 * Implements main crawling logic using JSoup for 
-	 * parsing the html from the passed URL
-	 * @throws IOException 
+	 * crawls
+	 * i.e. visits the urlPassed and fetches the document,
+	 * then fetches all the URLs from it and adds unique ones
+	 * to its parent controller in case they haven't already been
+	 * parsed.
+	 * 
+	 * may stop execution in case of an InterruptException or 
+	 * BrokenBarrierException while waiting at the barrier
+	 * 
+	 * may stop execution in case of an SSLHandshakeException
+	 * occurrence while trying to connect to a URL
 	 */
 	public void crawl() throws IOException {
 		try {
@@ -34,18 +52,17 @@ public class Crawler implements Runnable{
 			//Searching for a:href in the Document instance
 			Elements links = document.select("a[href]");
 			parseLoop: for(Element link: links) {
-				//Printing the links to the standard output console
+				//Printing the links to the 
 				String obtainedUrl = link.attr("abs:href");
-				if(!this.controller.getParsedUrls().contains(obtainedUrl)) {
-					System.out.println(obtainedUrl);
-					this.controller.getParsedUrls().add(obtainedUrl);
-					this.controller.addToQueueOfUrls(obtainedUrl);
-					this.controller.getPrinter().write(obtainedUrl);
-					this.controller.getPrinter().flush();
+				if(!this.controller.contains(obtainedUrl)) {
+					LOGGER.debug(obtainedUrl);
+					this.controller.addParsedUrl(obtainedUrl);
+					this.controller.addUrlToParse(obtainedUrl);
+					reportParsing(obtainedUrl);
+					this.controller.incrementIterationCount();
 				}
-				this.controller.incrementIterationCount();
 				if(!(this.controller.getIterationCount() < Constants.MAX_ITERATION_LIMIT)) {
-					this.controller.shutDownExecutorService();
+					this.controller.stopCrawlers();
 					break parseLoop;
 				}
 			}
@@ -54,12 +71,20 @@ public class Crawler implements Runnable{
 		        
 		    }
 		} catch (InterruptedException e) {
-			System.err.println("Exception"+e.getClass()+" occurred while waiting at barrier");
+			LOGGER.error("Exception"+e.getClass()+" occurred while waiting at barrier");
 		} catch (BrokenBarrierException e) {
-			System.err.println("Exception"+e.getClass()+" occurred while waiting at barrier");
-		} catch(javax.net.ssl.SSLHandshakeException e) {
-			System.err.println("Could not connect to " +this.urlPassed+ " due to SSLHandshakeException ");
+			LOGGER.error("Exception"+e.getClass()+" occurred while waiting at barrier");
+		} catch(SSLHandshakeException e) {
+			LOGGER.error("Could not connect to " +this.urlPassed+ " due to SSLHandshakeException ");
 		}
+	}
+	
+	/**
+	 * reports the URL obtained while parsing to the controller 
+	 * being answered
+	 */
+	public void reportParsing(String obtainedUrl) {
+		this.controller.reportParsing(obtainedUrl);
 	}
 
 	@Override
@@ -67,7 +92,7 @@ public class Crawler implements Runnable{
 		try {
 			crawl();
 		} catch (IOException e) {
-			System.err.println("An error occurred while trying to parse " +this.urlPassed);
+			LOGGER.error("An error occurred while trying to parse " +this.urlPassed);
 			e.printStackTrace();
 		}
 	}
