@@ -1,5 +1,6 @@
 package com.controller;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 
 import com.crawler.Crawler;
-import com.util.Constants;
+import com.util.CrawlParameters;
 import com.util.Printer;
 import com.util.UrlUtil;
 
@@ -27,12 +28,13 @@ public class CrawlController {
 	
 	private Logger LOGGER = Logger.getLogger(CrawlController.class);
 
-    private BlockingQueue<String> queueOfUrls = new ArrayBlockingQueue<String>(Constants.MAX_QUEUE_SIZE);
+    private BlockingQueue<String> queueOfUrls = new ArrayBlockingQueue<String>(CrawlParameters.MAX_QUEUE_SIZE);
     private ExecutorService executorService = new ThreadPoolExecutor(0, 10, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     private CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
-    private Printer printer =  new Printer(Constants.FILE_NAME);
+    private Printer printer =  new Printer(CrawlParameters.FILE_NAME);
     private Set<String> parsedUrls = new HashSet<String>();
 	private AtomicInteger iterationCount = new AtomicInteger(0);
+	private boolean userInterrupted = true;
 
     /**
      * Declares crawlers for the contents of the queue adds them to the executor service 
@@ -45,7 +47,7 @@ public class CrawlController {
     public void startCrawlers() {
 		try {
 			/* Check if the FIFO has any URLs left to parse and parse it upto allowed iteration limit */
-	    	while(!queueOfUrls.isEmpty() || !(iterationCount.get() < Constants.MAX_ITERATION_LIMIT)) {
+	    	while(!queueOfUrls.isEmpty() || !(iterationCount.get() < CrawlParameters.MAX_ITERATION_LIMIT)) {
 				Crawler crawler = new Crawler(this, queueOfUrls.take());
 				executorService.submit(crawler);
 				LOGGER.debug("New Crawler submitted");
@@ -55,9 +57,9 @@ public class CrawlController {
 				}
 	    	}
 		} catch (InterruptedException e) {
-			LOGGER.error("Exception"+e.getClass()+" occurred while trying to fetch from Queue of URLs");
+			LOGGER.error("CrawlController Interrupted");
 		} catch (BrokenBarrierException e) {
-			LOGGER.error("Exception"+e.getClass()+" occurred while trying wait for entries in Queue of URLs");
+			LOGGER.error("Barrier Broken at CrawlController");
 		} finally {
 			stopCrawlers();
 		}
@@ -76,16 +78,16 @@ public class CrawlController {
 			  LOGGER.debug("Shutting down unclosed Crawlers forcefully");
 			  this.executorService.shutdownNow();
 			}
-			LOGGER.debug("Parsed URLs");
-			for(String url : this.getParsedUrls()) {
-				LOGGER.debug("url -> "+url);
-			}
 			this.printer.close();
 			LOGGER.debug("Program ended safely");
+			System.out.println("Crawling ended");
+			System.out.println("Obtained URLs can be viewed in "+CrawlParameters.FILE_NAME);
+			this.setUserInterrupted(false);
 			System.exit(1);
-			Logger.shutdown();
 		} catch (InterruptedException e) {
-			LOGGER.error("Exception"+e.getClass()+" occurred while waiting for crawlers to stop");
+			LOGGER.error("CrawlController Interrupted");
+		} catch (ConcurrentModificationException e) {
+			LOGGER.error("Forced closure detected");
 		}
     }
     
@@ -161,6 +163,14 @@ public class CrawlController {
 	public void reportParsing(String obtainedUrl) {
 		this.getPrinter().write(obtainedUrl);
 		this.getPrinter().flush();
+	}
+
+	public boolean isUserInterrupted() {
+		return userInterrupted;
+	}
+
+	public void setUserInterrupted(boolean userInterrupted) {
+		this.userInterrupted = userInterrupted;
 	}
 	
 	

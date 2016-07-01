@@ -8,7 +8,7 @@ any URLs it finds in the page. It saves the unique URLs hence found in a file.
 Input Specifics:
 ---------------
 The project uses CrawlInvoker to invoke the CrawlController that controls multiple threads by implementing Crawlers. These 
-crawlers parse a specific URL each and then save the unique URLs to a file which has to be declared in Constants.java.
+crawlers parse a specific URL each and then save the unique URLs to a file which has to be determined from user input.
 
 
 Execution Specifics:
@@ -23,9 +23,7 @@ The file used to flush the data here is crawlLog.dat
 
 All events related to the Project are being logged in WebCrawler.log
 
-Points to Ponder:
+How to run:
 -----------------------
-Currently the project has to be built using Eclipse. All related dependencies are mentioned in .classpath file and are in 
-lib folder of the project.
-
-Maven dependencies are yet to be declared. So, invoking mvn install may cause errors in build.
+Checkout the project and invoke runCrawler.bat
+Give the URL, maximum number of URLs to be written and a file name to which 

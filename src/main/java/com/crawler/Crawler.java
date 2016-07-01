@@ -12,7 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.controller.CrawlController;
-import com.util.Constants;
+import com.util.CrawlParameters;
 
 /**
  * @author kryas
@@ -59,13 +59,12 @@ public class Crawler implements Runnable{
 				//Reporting the success of parsing to the controller so that
 				//it can pass it to the required repository
 				//and upon successfull passing it will increment the parsed URL count 
-					LOGGER.debug(obtainedUrl);
 					this.controller.addParsedUrl(obtainedUrl);
 					this.controller.addUrlToParse(obtainedUrl);
 					reportParsing(obtainedUrl);
 					this.controller.incrementIterationCount();
 				}
-				if(!(this.controller.getIterationCount() < Constants.MAX_ITERATION_LIMIT)) {
+				if(!(this.controller.getIterationCount() < CrawlParameters.MAX_ITERATION_LIMIT)) {
 					//In case maximum number of possible iterations as defined in Constants.java is
 					//reached, it will cause the program to stop by asking the controller to 
 					//stop all threads and abort execution
@@ -79,9 +78,9 @@ public class Crawler implements Runnable{
 		        
 		    }
 		} catch (InterruptedException e) {
-			LOGGER.error("Exception"+e.getClass()+" occurred while waiting at barrier");
+			LOGGER.error("Crawler interrupted");
 		} catch (BrokenBarrierException e) {
-			LOGGER.error("Exception"+e.getClass()+" occurred while waiting at barrier");
+			LOGGER.error("Barrier broken by Crawler");
 		} catch(SSLHandshakeException e) {
 			LOGGER.error("Could not connect to " +this.urlPassed+ " due to SSLHandshakeException ");
 		}
@@ -101,7 +100,6 @@ public class Crawler implements Runnable{
 			crawl();
 		} catch (IOException e) {
 			LOGGER.error("An error occurred while trying to parse " +this.urlPassed);
-			e.printStackTrace();
 		}
 	}
 }
