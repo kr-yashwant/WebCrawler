@@ -1,5 +1,4 @@
 com\util\UrlUtil.class
-com\test\CrawlInvocationTester.class
 com\crawler\Crawler.class
 com\controller\CrawlInvoker.class
 com\controller\CrawlInvoker$1.class
