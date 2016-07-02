@@ -50,7 +50,6 @@ public class CrawlController {
 	    	while(!queueOfUrls.isEmpty() || !(iterationCount.get() < CrawlParameters.MAX_ITERATION_LIMIT)) {
 				Crawler crawler = new Crawler(this, queueOfUrls.take());
 				executorService.submit(crawler);
-				LOGGER.debug("New Crawler submitted");
 				
 				if(queueOfUrls.isEmpty()) {
 					cyclicBarrier.await();

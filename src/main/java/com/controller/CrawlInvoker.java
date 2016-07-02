@@ -38,7 +38,7 @@ public class CrawlInvoker {
 			System.out.println("Invalid limit entered! Default limit is 1000");
 		}
 		System.out.println("Please enter a file name to be used a repository of URLs:");
-		String fileName = scanner.nextLine()+".dat";
+		String fileName = scanner.nextLine()+".log";
 		System.out.println("Crawling started");
 		
 		CrawlParameters.MAX_RECORD_OUTPUT = limit;
