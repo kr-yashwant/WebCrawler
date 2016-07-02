@@ -64,8 +64,8 @@ public class Crawler implements Runnable{
 					reportParsing(obtainedUrl);
 					this.controller.incrementIterationCount();
 				}
-				if(!(this.controller.getIterationCount() < CrawlParameters.MAX_ITERATION_LIMIT)) {
-					//In case maximum number of possible iterations as defined in Constants.java is
+				if((this.controller.getIterationCount() >= CrawlParameters.MAX_ITERATION_LIMIT)) {
+					//In case maximum number of possible iterations as defined in CrawlParameters.java is
 					//reached, it will cause the program to stop by asking the controller to 
 					//stop all threads and abort execution
 					this.controller.stopCrawlers();

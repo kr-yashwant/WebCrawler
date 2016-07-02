@@ -47,7 +47,7 @@ public class CrawlController {
     public void startCrawlers() {
 		try {
 			/* Check if the FIFO has any URLs left to parse and parse it upto allowed iteration limit */
-	    	while(!queueOfUrls.isEmpty() || !(iterationCount.get() < CrawlParameters.MAX_ITERATION_LIMIT)) {
+	    	while(!queueOfUrls.isEmpty() || (iterationCount.get() >= CrawlParameters.MAX_ITERATION_LIMIT)) {
 				Crawler crawler = new Crawler(this, queueOfUrls.take());
 				executorService.submit(crawler);
 				
