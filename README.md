@@ -25,13 +25,11 @@ All events related to the Project are being logged in WebCrawler.log
 
 How to run:
 -----------------------
-For windows:  Checkout the project and invoke runCrawler.bat
+Download WebCrawler-1.0-jar-with-dependencies.jar and invoke java -jar WebCrawler-1.0-jar-with-dependencies.jar using
+a command line. (e.g.- cmd, bash etc.)
 
-For Mac/Linux:  Checkout the project, change read/write access for runCrawler.sh using 
-                chmod 755 runCrawler.sh 
-                and then 
-                bash runCrawler.sh
+Alternatively, runCrawler.bat or runCrawler.sh can be invoked depending upon the desired platforms.
 
 
 Give the URL, maximum number of URLs to be written and a file name to which the obtained URLs are to be logged
-The output will be saved in the file with a .dat extension
+The output will be saved in the file with a .log extension.
