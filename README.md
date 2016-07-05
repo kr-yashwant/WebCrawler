@@ -19,7 +19,7 @@ by user.
 
 Output Specifics:
 ----------------
-The file used to flush the data here is crawlLog.dat
+The file used to flush the data here is taken from user input
 
 All events related to the Project are being logged in WebCrawler.log
 
