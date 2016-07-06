@@ -73,7 +73,7 @@ public class Crawler implements Runnable{
 				}
 			}
 			if(this.controller.getCyclicBarrier().getNumberWaiting()==1){
-				//Waiting at the barrier
+				//Wake the controller up if it is waiting at the barrier
 		        this.controller.getCyclicBarrier().await();
 		        
 		    }
